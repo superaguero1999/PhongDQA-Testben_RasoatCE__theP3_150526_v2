@@ -972,6 +972,9 @@
     setWithPct("ce-kpi-da-gui", "ce-kpi-da-gui-pct", daGui);
     setWithPct("ce-kpi-khong-can", "ce-kpi-khong-can-pct", khongCan);
     setWithPct("ce-kpi-gm-chua-gui", "ce-kpi-gm-chua-gui-pct", gmChuaGui);
+    const hoanThanh = daGui + khongCan;
+    set("ce-kpi-hoan-thanh", cePercent(hoanThanh, visible));
+    set("ce-kpi-hoan-thanh-sub", hoanThanh + "/" + visible);
     syncCeQuickChips();
   }
 

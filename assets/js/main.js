@@ -721,6 +721,9 @@
     setWithPct("testben-kpi-doing", "testben-kpi-doing-pct", doing);
     setWithPct("testben-kpi-done", "testben-kpi-done-pct", done);
     setWithPct("testben-kpi-cancel", "testben-kpi-cancel-pct", cancel);
+    const declared = doing + done + cancel;
+    set("testben-kpi-khai-bao", durPercent(declared, nVisible));
+    set("testben-kpi-khai-bao-sub", declared + "/" + nVisible);
     syncTestbenQuickChips();
   }
 

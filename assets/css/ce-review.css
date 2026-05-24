@@ -92,6 +92,34 @@
   color: #1e40af !important;
 }
 
+/* KPI «Tỷ lệ hoàn thành CE» — nổi bật hơn các ô còn lại */
+#panel-ce .ce-kpi-card-hoan-thanh {
+  min-height: 4.75rem;
+  border: 2px solid #0284c7 !important;
+  background: linear-gradient(165deg, #e0f2fe 0%, #bae6fd 42%, #f0f9ff 100%) !important;
+  box-shadow:
+    0 4px 14px rgba(2, 132, 199, 0.28),
+    0 0 0 1px rgba(14, 165, 233, 0.15) !important;
+  transform: translateY(-1px);
+}
+
+#panel-ce #ce-kpi-hoan-thanh {
+  color: #0c4a6e !important;
+  font-size: 1.75rem !important;
+  font-weight: 900 !important;
+  letter-spacing: -0.02em;
+}
+
+#panel-ce #ce-kpi-hoan-thanh-sub {
+  color: #0369a1 !important;
+  font-weight: 800 !important;
+}
+
+#panel-ce .ce-kpi-hoan-thanh-label {
+  color: #075985 !important;
+  letter-spacing: 0.06em;
+}
+
 #panel-ce .ce-table-meta {
   font-size: 0.875rem;
   color: #475569;

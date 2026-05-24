@@ -2157,6 +2157,11 @@
         <span class="testben-kpi-pct" id="testben-kpi-cancel-pct">0%</span>
         <span class="testben-kpi-label">Cancel</span>
       </div>
+      <div class="testben-kpi-card status-khai-bao testben-kpi-card-khai-bao" data-kpi="khai-bao">
+        <span class="testben-kpi-value" id="testben-kpi-khai-bao">0%</span>
+        <span class="testben-kpi-pct" id="testben-kpi-khai-bao-sub">0/0</span>
+        <span class="testben-kpi-label testben-kpi-khai-bao-label">Tỷ lệ khai báo</span>
+      </div>
     </div>
 
     <div class="testben-quick-filters" role="group" aria-label="Lọc nhanh Test bền">
@@ -2224,7 +2229,7 @@
         <button id="ce-detail-btn" type="button" class="btn ce-detail-mini text-xs px-3 py-1.5 rounded-lg border border-slate-300 bg-white hover:bg-slate-50 shrink-0">Chi tiết</button>
       </div>
 
-      <div id="ce-kpi" class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-2.5 mb-3" hidden aria-label="Tóm tắt CE">
+      <div id="ce-kpi" class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-2.5 mb-3" hidden aria-label="Tóm tắt CE">
         <div class="rounded-lg border border-blue-200 bg-gradient-to-b from-blue-50 to-white p-3 shadow-sm">
           <div id="ce-kpi-visible" class="text-2xl font-extrabold tabular-nums text-slate-900">0</div>
           <div class="text-[11px] font-bold uppercase tracking-wide text-slate-500 mt-0.5">Đang hiển thị</div>
@@ -2248,6 +2253,11 @@
           <div id="ce-kpi-gm-chua-gui" class="text-2xl font-extrabold tabular-nums text-violet-700">0</div>
           <div id="ce-kpi-gm-chua-gui-pct" class="text-sm font-bold tabular-nums text-violet-600/90 mt-0.5">0%</div>
           <div class="text-[11px] font-bold uppercase tracking-wide text-slate-500 mt-0.5">GM chưa gửi</div>
+        </div>
+        <div class="ce-kpi-card-hoan-thanh rounded-xl p-3 shadow-md ring-2 ring-sky-400/80">
+          <div id="ce-kpi-hoan-thanh" class="text-3xl font-black tabular-nums leading-tight">0%</div>
+          <div id="ce-kpi-hoan-thanh-sub" class="text-sm font-extrabold tabular-nums mt-0.5">0/0</div>
+          <div class="ce-kpi-hoan-thanh-label text-[11px] font-extrabold uppercase tracking-wide mt-1">Tỷ lệ hoàn thành CE</div>
         </div>
       </div>
 
