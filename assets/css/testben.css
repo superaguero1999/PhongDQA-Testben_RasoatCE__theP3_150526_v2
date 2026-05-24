@@ -1,0 +1,263 @@
+/**
+ * Module Test bền — giao diện (không npm).
+ * Bổ sung / ghi đè nhẹ; logic lọc & render giữ nguyên trong main.js.
+ */
+
+#panel-testben {
+  --tb-accent: #2563eb;
+  --tb-accent-soft: #eff6ff;
+  --tb-manual-head: #bfdbfe;
+  --tb-manual-cell: #eff6ff;
+  --tb-sticky-shadow: 4px 0 8px -2px rgba(15, 23, 42, 0.12);
+}
+
+#panel-testben .topbar {
+  padding-bottom: 4px;
+  border-bottom: 1px solid var(--line);
+  margin-bottom: 12px;
+}
+
+#panel-testben .topbar h1 {
+  font-size: 22px;
+  letter-spacing: -0.02em;
+}
+
+/* —— KPI —— */
+.testben-kpi {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(128px, 1fr));
+  gap: 10px;
+  margin: 12px 0 10px;
+}
+
+.testben-kpi-card {
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  padding: 10px 12px;
+  background: linear-gradient(180deg, #ffffff 0%, #f8fafc 100%);
+  min-height: 64px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  gap: 2px;
+}
+
+.testben-kpi-card .testben-kpi-value {
+  font-size: 22px;
+  font-weight: 800;
+  line-height: 1.1;
+  color: #0f172a;
+  font-variant-numeric: tabular-nums;
+}
+
+.testben-kpi-card .testben-kpi-pct {
+  font-size: 14px;
+  font-weight: 700;
+  line-height: 1.2;
+  color: #64748b;
+  font-variant-numeric: tabular-nums;
+}
+
+.testben-kpi-card .testben-kpi-label {
+  font-size: 11px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  color: #64748b;
+}
+
+.testben-kpi-card.is-highlight {
+  border-color: #93c5fd;
+  background: linear-gradient(180deg, #eff6ff 0%, #dbeafe 100%);
+}
+
+.testben-kpi-card.status-pending .testben-kpi-value { color: #475569; }
+.testben-kpi-card.status-pending .testben-kpi-pct { color: #64748b; }
+.testben-kpi-card.status-doing .testben-kpi-value { color: #1d4ed8; }
+.testben-kpi-card.status-doing .testben-kpi-pct { color: #2563eb; }
+.testben-kpi-card.status-done .testben-kpi-value { color: #047857; }
+.testben-kpi-card.status-done .testben-kpi-pct { color: #059669; }
+.testben-kpi-card.status-cancel .testben-kpi-value { color: #b45309; }
+.testben-kpi-card.status-cancel .testben-kpi-pct { color: #d97706; }
+
+/* —— Lọc nhanh —— */
+.testben-quick-filters {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 10px;
+  padding: 10px 12px;
+  background: #f8fafc;
+  border: 1px solid var(--line);
+  border-radius: 10px;
+}
+
+.testben-quick-label {
+  font-size: 12px;
+  font-weight: 700;
+  color: #475569;
+  margin-right: 4px;
+}
+
+.testben-chip {
+  border: 1px solid #cbd5e1;
+  background: #fff;
+  color: #334155;
+  border-radius: 999px;
+  padding: 6px 12px;
+  font-size: 12px;
+  font-weight: 600;
+  cursor: pointer;
+  font-family: inherit;
+  transition: background 0.12s ease, border-color 0.12s ease, color 0.12s ease;
+}
+
+.testben-chip:hover {
+  background: #f1f5f9;
+  border-color: #94a3b8;
+}
+
+.testben-chip:focus-visible {
+  outline: 2px solid #93c5fd;
+  outline-offset: 2px;
+}
+
+.testben-chip.is-active {
+  background: var(--tb-accent-soft);
+  border-color: var(--tb-accent);
+  color: #1e40af;
+}
+
+.testben-chip.chip-clear {
+  border-style: dashed;
+  color: #64748b;
+}
+
+/* —— Filter bar trong panel —— */
+#panel-testben .filter-bar {
+  padding: 10px 12px;
+  background: #fff;
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  margin-top: 0;
+}
+
+#panel-testben .table-wrap {
+  border-radius: 12px;
+  box-shadow: 0 4px 16px rgba(15, 23, 42, 0.06);
+}
+
+/* Zebra + hover */
+#panel-testben #table-root table tbody tr:nth-child(even) td {
+  background-color: #f8fafc;
+}
+
+#panel-testben #table-root table tbody tr:nth-child(even) td.col-manual {
+  background-color: #e8f2ff;
+}
+
+#panel-testben #table-root table tbody tr:hover td {
+  background-color: #f1f5f9 !important;
+}
+
+#panel-testben #table-root table tbody tr:hover td.col-manual {
+  background-color: #dbeafe !important;
+}
+
+#panel-testben #table-root table tbody tr.row-selected td {
+  background: #dbeafe !important;
+}
+
+#panel-testben #table-root table tbody tr.row-selected td.col-manual {
+  background: #bfdbfe !important;
+}
+
+/* Cột đóng băng trái: Mã tác vụ + Tên tác vụ */
+#panel-testben #table-root table thead th.col-task-code,
+#panel-testben #table-root table tbody td.col-task-code {
+  position: sticky;
+  left: 0;
+  z-index: 4;
+  background: #e2e8f0;
+  box-shadow: var(--tb-sticky-shadow);
+}
+
+#panel-testben #table-root table tbody td.col-task-code {
+  background: #f1f5f9;
+  z-index: 2;
+}
+
+#panel-testben #table-root table thead th.col-task-name,
+#panel-testben #table-root table tbody td.col-task-name {
+  position: sticky;
+  z-index: 3;
+  box-shadow: var(--tb-sticky-shadow);
+}
+
+#panel-testben #table-root table:not(.dur-hide-optional-cols) thead th.col-task-name,
+#panel-testben #table-root table:not(.dur-hide-optional-cols) tbody td.col-task-name {
+  left: 117px;
+}
+
+#panel-testben #table-root table:not(.dur-hide-optional-cols) thead th.col-task-name {
+  background: #e2e8f0;
+}
+
+#panel-testben #table-root table:not(.dur-hide-optional-cols) tbody td.col-task-name {
+  background: #f8fafc;
+  z-index: 2;
+}
+
+#panel-testben #table-root table.dur-hide-optional-cols thead th.col-task-name,
+#panel-testben #table-root table.dur-hide-optional-cols tbody td.col-task-name {
+  left: 0;
+}
+
+#panel-testben #table-root table.dur-hide-optional-cols thead th.col-task-name {
+  background: #e2e8f0;
+}
+
+#panel-testben #table-root table.dur-hide-optional-cols tbody td.col-task-name {
+  background: #f8fafc;
+}
+
+#panel-testben #table-root table thead th.col-task-code,
+#panel-testben #table-root table thead th.col-task-name {
+  z-index: 5;
+}
+
+#panel-testben #table-root table tbody tr.row-selected td.col-task-code,
+#panel-testben #table-root table tbody tr.row-selected td.col-task-name {
+  background: #dbeafe !important;
+}
+
+/* Vùng nhập Test bền — viền trái nhẹ */
+#panel-testben #table-root table th.col-manual:first-of-type,
+#panel-testben #table-root table td.col-manual:first-of-type {
+  box-shadow: inset 3px 0 0 #60a5fa;
+}
+
+#panel-testben #table-root table th.col-manual {
+  background: var(--tb-manual-head);
+}
+
+#panel-testben #table-root table td.col-manual {
+  background: var(--tb-manual-cell);
+}
+
+/* Ô trống */
+#panel-testben #table-root .empty {
+  padding: 32px 20px;
+  font-size: 14px;
+}
+
+@media (max-width: 720px) {
+  .testben-kpi {
+    grid-template-columns: repeat(2, 1fr);
+  }
+  #panel-testben .filter-input {
+    min-width: 0;
+    width: 100%;
+  }
+}

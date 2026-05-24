@@ -1,0 +1,76 @@
+/**
+ * Shell Theo dõi P3 — bổ sung Tailwind (CDN) + đọc bảng.
+ * Bảng / modal / badge giữ trong p3.css; file này chỉ layout embed và tinh chỉnh bảng.
+ */
+
+#panel-p3 .p3-panel.panel,
+.p3-panel.p3-panel-embed {
+  border: none;
+  background: transparent;
+  padding: 0;
+  border-radius: 0;
+}
+
+#panel-p3 .p3-panel h1,
+.p3-panel .p3-shell-title {
+  margin: 0;
+}
+
+#panel-p3 .p3-filters,
+.p3-panel .p3-filters {
+  margin-bottom: 0.75rem;
+  border-width: 1px;
+  border-color: #e2e8f0;
+  background: rgba(248, 250, 252, 0.95);
+  box-shadow: 0 1px 3px rgba(15, 23, 42, 0.06);
+}
+
+#panel-p3 .p3-filter-actions,
+.p3-panel .p3-filter-actions {
+  flex-direction: row;
+  flex-wrap: wrap;
+  align-items: center;
+  max-width: none;
+  width: 100%;
+}
+
+#panel-p3 .p3-filter-select,
+#panel-p3 .p3-filter-input,
+.p3-panel .p3-filter-select,
+.p3-panel .p3-filter-input {
+  border-radius: 0.5rem;
+}
+
+#panel-p3 .p3-table-scroll,
+.p3-panel .p3-table-scroll {
+  border-width: 1px;
+  border-color: #e2e8f0;
+  box-shadow: 0 4px 16px rgba(15, 23, 42, 0.06);
+}
+
+#panel-p3 .p3-table tbody tr:nth-child(even) td,
+.p3-panel .p3-table tbody tr:nth-child(even) td {
+  filter: brightness(0.985);
+}
+
+#panel-p3 .p3-table tbody tr:hover td,
+.p3-panel .p3-table tbody tr:hover td {
+  filter: brightness(0.96);
+}
+
+#panel-p3 .p3-loading-banner,
+.p3-panel .p3-loading-banner {
+  border-radius: 0.75rem;
+  border: 1px solid #e2e8f0;
+  background: linear-gradient(180deg, #f8fafc 0%, #fff 100%);
+  box-shadow: 0 1px 3px rgba(15, 23, 42, 0.06);
+}
+
+#panel-p3 .p3-err,
+.p3-panel .p3-err {
+  padding: 1rem 1.25rem;
+  border-radius: 0.75rem;
+  border: 1px solid #fecaca;
+  background: #fef2f2;
+  color: #b91c1c;
+}

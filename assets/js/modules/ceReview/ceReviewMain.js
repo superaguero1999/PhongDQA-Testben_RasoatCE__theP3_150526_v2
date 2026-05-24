@@ -426,19 +426,25 @@
     });
   }
 
-  /** Nếu #panel-ce nằm trong #panel-testben (thiếu </div> trong HTML), ẩn Test bền sẽ ẩn luôn CE — đưa CE ra làm anh em của panel Test bền. */
-  function ensureCePanelOutsideTestbenPanel() {
+  /** Nếu panel CE/P3 nằm trong #panel-testben (HTML lỗi), ẩn Test bền sẽ ẩn luôn module con — đưa ra làm anh em. */
+  function ensureModulePanelsOutsideTestbenPanel() {
     const testben = qs("#panel-testben");
+    if (!testben) return;
     const ce = qs("#panel-ce");
-    if (!testben || !ce || !testben.contains(ce)) return;
+    const p3 = qs("#panel-p3");
     try {
-      testben.after(ce);
+      if (ce && testben.contains(ce)) testben.after(ce);
+      if (p3 && testben.contains(p3)) {
+        const after = qs("#panel-ce") || testben;
+        after.after(p3);
+      }
     } catch (_) {}
   }
 
   function setActiveModule(name) {
     const mod = String(name || "").trim();
     if (!mod) return;
+    ensureModulePanelsOutsideTestbenPanel();
     const tabs = document.querySelectorAll(".module-tab[data-module]");
     const panels = document.querySelectorAll(".app-module-panel");
     tabs.forEach((t) => {
@@ -860,17 +866,155 @@
     ceFilterTimer = setTimeout(() => renderTable(), 200);
   }
 
+  function clearCeFilterUiState() {
+    const s1 = qs("#ce-filter-field-1");
+    const s2 = qs("#ce-filter-field-2");
+    const v1 = qs("#ce-filter-value-1");
+    const v2 = qs("#ce-filter-value-2");
+    const d1f = qs("#ce-filter-datetime-from-1");
+    const d1t = qs("#ce-filter-datetime-to-1");
+    const d2f = qs("#ce-filter-datetime-from-2");
+    const d2t = qs("#ce-filter-datetime-to-2");
+    const sm = qs("#ce-filter-month");
+    if (s1) {
+      s1.value = "";
+      s1.removeAttribute("data-ce-prev-field");
+    }
+    if (s2) {
+      s2.value = "";
+      s2.removeAttribute("data-ce-prev-field");
+    }
+    if (v1) v1.value = "";
+    if (v2) v2.value = "";
+    if (d1f) d1f.value = "";
+    if (d1t) d1t.value = "";
+    if (d2f) d2f.value = "";
+    if (d2t) d2t.value = "";
+    if (sm) sm.value = "";
+    syncCeCustomFilterRowUI(1);
+    syncCeCustomFilterRowUI(2);
+  }
+
+  function setCeFilterSlotText(slot, fieldKey, textValue) {
+    const sel = qs("#ce-filter-field-" + slot);
+    const val = qs("#ce-filter-value-" + slot);
+    if (sel) sel.value = String(fieldKey || "");
+    syncCeCustomFilterRowUI(slot);
+    if (val) val.value = String(textValue || "");
+  }
+
+  function syncCeQuickChips() {
+    const chips = document.querySelectorAll("#panel-ce [data-ce-quick]");
+    if (!chips.length) return;
+    const lblChuaGui = (Logic && Logic.TRANG_THAI && Logic.TRANG_THAI.CHUA_GUI) || "Chưa gửi";
+    const lblDaGui = (Logic && Logic.TRANG_THAI && Logic.TRANG_THAI.DA_GUI) || "Đã gửi";
+    const lblKhongCan = (Logic && Logic.TRANG_THAI && Logic.TRANG_THAI.KHONG_CAN) || "Không cần";
+    const monthKey = getCurrentLocalMonthKey();
+    const f1 = String(qs("#ce-filter-field-1") && qs("#ce-filter-field-1").value || "").trim();
+    const v1 = String(qs("#ce-filter-value-1") && qs("#ce-filter-value-1").value || "").trim();
+    const f2 = String(qs("#ce-filter-field-2") && qs("#ce-filter-field-2").value || "").trim();
+    const monthVal = String(qs("#ce-filter-month") && qs("#ce-filter-month").value || "").trim();
+    let active = "";
+    if (!f1 && !f2 && !monthVal) {
+      active = "clear";
+    } else if (f1 === "trangThaiCe" && v1 === lblChuaGui && !f2 && !monthVal) {
+      active = "ce-chua-gui";
+    } else if (f1 === "trangThaiCe" && v1 === lblDaGui && !f2 && !monthVal) {
+      active = "ce-da-gui";
+    } else if (f1 === "trangThaiCe" && v1 === lblKhongCan && !f2 && !monthVal) {
+      active = "ce-khong-can";
+    } else if (f1 === "trangThaiGiaoMau" && v1 === "Chưa gửi" && !f2 && !monthVal) {
+      active = "gm-chua-gui";
+    } else if (!f1 && !f2 && monthVal === monthKey) {
+      active = "month";
+    }
+    chips.forEach((btn) => {
+      const kind = String(btn.getAttribute("data-ce-quick") || "");
+      btn.classList.toggle("is-active", kind === active);
+    });
+  }
+
+  function updateCeKpi() {
+    const kpiRoot = qs("#ce-kpi");
+    if (!kpiRoot) return;
+    const total = cachedRows.length;
+    if (!total) kpiRoot.setAttribute("hidden", "");
+    else kpiRoot.removeAttribute("hidden");
+    if (!total) return;
+
+    const rows = getFilteredRows();
+    const lblChuaGui = (Logic && Logic.TRANG_THAI && Logic.TRANG_THAI.CHUA_GUI) || "Chưa gửi";
+    const lblDaGui = (Logic && Logic.TRANG_THAI && Logic.TRANG_THAI.DA_GUI) || "Đã gửi";
+    const lblKhongCan = (Logic && Logic.TRANG_THAI && Logic.TRANG_THAI.KHONG_CAN) || "Không cần";
+    let chuaGui = 0;
+    let daGui = 0;
+    let khongCan = 0;
+    let gmChuaGui = 0;
+    for (let i = 0; i < rows.length; i += 1) {
+      const r = rows[i] || {};
+      const st = String(r.trangThaiCe || "").trim();
+      if (st === lblDaGui) daGui += 1;
+      else if (st === lblKhongCan) khongCan += 1;
+      else if (st === lblChuaGui) chuaGui += 1;
+      if (normalizeTrangThaiGiaoMau(r.trangThaiGiaoMau) === "Chưa gửi") gmChuaGui += 1;
+    }
+    const visible = rows.length;
+    const set = (id, val) => {
+      const el = document.getElementById(id);
+      if (el) el.textContent = String(val);
+    };
+    const setWithPct = (countId, pctId, count) => {
+      set(countId, count);
+      set(pctId, cePercent(count, visible));
+    };
+    set("ce-kpi-visible", visible);
+    setWithPct("ce-kpi-chua-gui", "ce-kpi-chua-gui-pct", chuaGui);
+    setWithPct("ce-kpi-da-gui", "ce-kpi-da-gui-pct", daGui);
+    setWithPct("ce-kpi-khong-can", "ce-kpi-khong-can-pct", khongCan);
+    setWithPct("ce-kpi-gm-chua-gui", "ce-kpi-gm-chua-gui-pct", gmChuaGui);
+    syncCeQuickChips();
+  }
+
+  function applyCeQuickFilter(kind) {
+    const k = String(kind || "");
+    clearCeFilterUiState();
+    if (k === "clear") {
+      syncCeQuickChips();
+      scheduleCeTableRender();
+      return;
+    }
+    const lblChuaGui = (Logic && Logic.TRANG_THAI && Logic.TRANG_THAI.CHUA_GUI) || "Chưa gửi";
+    const lblDaGui = (Logic && Logic.TRANG_THAI && Logic.TRANG_THAI.DA_GUI) || "Đã gửi";
+    const lblKhongCan = (Logic && Logic.TRANG_THAI && Logic.TRANG_THAI.KHONG_CAN) || "Không cần";
+    if (k === "ce-chua-gui") {
+      setCeFilterSlotText(1, "trangThaiCe", lblChuaGui);
+    } else if (k === "ce-da-gui") {
+      setCeFilterSlotText(1, "trangThaiCe", lblDaGui);
+    } else if (k === "ce-khong-can") {
+      setCeFilterSlotText(1, "trangThaiCe", lblKhongCan);
+    } else if (k === "gm-chua-gui") {
+      setCeFilterSlotText(1, "trangThaiGiaoMau", "Chưa gửi");
+    } else if (k === "month") {
+      const sm = qs("#ce-filter-month");
+      const nowKey = getCurrentLocalMonthKey();
+      if (sm && nowKey) sm.value = nowKey;
+    }
+    syncCeQuickChips();
+    scheduleCeTableRender();
+  }
+
   function setCeStatus(message, type) {
     const el = qs("#ce-status");
     if (!el) return;
+    const statusBaseClass = "status mt-3 rounded-lg text-sm";
     if (!message) {
       el.style.display = "none";
       el.textContent = "";
-      el.className = "status";
+      el.className = statusBaseClass;
       return;
     }
     el.style.display = "block";
-    el.className = "status " + (type || "");
+    el.className = statusBaseClass + " " + (type || "");
     if ((type || "") === "ok") {
       el.innerHTML =
         '<span class="status-ok-check">✓</span>' +
@@ -1656,6 +1800,7 @@
         intro +
         '<div class="ce-empty">' +
         'Chưa có dòng. Bấm <strong>Refresh dữ liệu</strong> để tải snapshot CE.</div>';
+      updateCeKpi();
       restoreCeTableScroll(root, scrollState);
       return;
     }
@@ -1667,6 +1812,7 @@
         " dòng</div>" +
         '<div class="ce-empty">' +
         "Không có dòng nào khớp bộ lọc. Kiểm tra ô «Lọc nhanh», hai cặp trường/giá trị (logic <strong>VÀ</strong>), hoặc bấm <strong>Xóa lọc</strong>.</div>";
+      updateCeKpi();
       restoreCeTableScroll(root, scrollState);
       return;
     }
@@ -1850,11 +1996,11 @@
 
     root.innerHTML =
       intro +
-      '<div class="ce-table-meta">Hiển thị: <strong>' +
+      '<div class="ce-table-meta text-sm text-slate-600 font-medium mb-2">Hiển thị: <strong class="text-slate-900">' +
       rows.length +
       "</strong> / " +
       cachedRows.length +
-      ' dòng <button id="ce-toggle-optional-cols-btn" type="button" class="btn btn-sm" style="margin-left:8px;">' +
+      ' dòng <button id="ce-toggle-optional-cols-btn" type="button" class="btn btn-sm ml-2 align-middle">' +
       (ceShowOptionalCols ? "−" : "+") +
       "</button></div>" +
       '<div class="ce-table-wrap">' +
@@ -1913,6 +2059,7 @@
       });
     });
 
+    updateCeKpi();
     restoreCeTableScroll(root, scrollState);
   }
 
@@ -2562,19 +2709,36 @@
     if (statsBtn) statsBtn.addEventListener("click", openCeStatsModal);
     if (giaoMauStatsBtn) giaoMauStatsBtn.addEventListener("click", openCeGiaoMauStatsModal);
     if (exportExcelBtn) exportExcelBtn.addEventListener("click", exportFilteredCeRowsToExcel);
-    if (monthFilterSel) monthFilterSel.addEventListener("change", scheduleCeTableRender);
+    if (monthFilterSel) {
+      monthFilterSel.addEventListener("change", () => {
+        syncCeQuickChips();
+        scheduleCeTableRender();
+      });
+    }
+
+    document.querySelectorAll("#panel-ce [data-ce-quick]").forEach((btn) => {
+      btn.addEventListener("click", () => {
+        applyCeQuickFilter(btn.getAttribute("data-ce-quick"));
+      });
+    });
 
     ["ce-filter-field-1", "ce-filter-field-2"].forEach((id, idx) => {
       const el = qs("#" + id);
       if (el)
         el.addEventListener("change", () => {
           syncCeCustomFilterRowUI(idx + 1);
+          syncCeQuickChips();
           scheduleCeTableRender();
         });
     });
     ["ce-filter-value-1", "ce-filter-value-2"].forEach((id) => {
       const el = qs("#" + id);
-      if (el) el.addEventListener("input", scheduleCeTableRender);
+      if (el) {
+        el.addEventListener("input", () => {
+          syncCeQuickChips();
+          scheduleCeTableRender();
+        });
+      }
     });
     [
       "ce-filter-datetime-from-1",
@@ -2584,40 +2748,22 @@
     ].forEach((id) => {
       const el = qs("#" + id);
       if (el) {
-        el.addEventListener("change", scheduleCeTableRender);
-        el.addEventListener("input", scheduleCeTableRender);
+        el.addEventListener("change", () => {
+          syncCeQuickChips();
+          scheduleCeTableRender();
+        });
+        el.addEventListener("input", () => {
+          syncCeQuickChips();
+          scheduleCeTableRender();
+        });
       }
     });
 
     const resetCustom = qs("#ce-filter-custom-reset");
     if (resetCustom) {
       resetCustom.addEventListener("click", () => {
-        const s1 = qs("#ce-filter-field-1");
-        const s2 = qs("#ce-filter-field-2");
-        const v1 = qs("#ce-filter-value-1");
-        const v2 = qs("#ce-filter-value-2");
-        const d1f = qs("#ce-filter-datetime-from-1");
-        const d1t = qs("#ce-filter-datetime-to-1");
-        const d2f = qs("#ce-filter-datetime-from-2");
-        const d2t = qs("#ce-filter-datetime-to-2");
-        const sm = qs("#ce-filter-month");
-        if (s1) {
-          s1.value = "";
-          s1.removeAttribute("data-ce-prev-field");
-        }
-        if (s2) {
-          s2.value = "";
-          s2.removeAttribute("data-ce-prev-field");
-        }
-        if (v1) v1.value = "";
-        if (v2) v2.value = "";
-        if (d1f) d1f.value = "";
-        if (d1t) d1t.value = "";
-        if (d2f) d2f.value = "";
-        if (d2t) d2t.value = "";
-        if (sm) sm.value = "";
-        syncCeCustomFilterRowUI(1);
-        syncCeCustomFilterRowUI(2);
+        clearCeFilterUiState();
+        syncCeQuickChips();
         scheduleCeTableRender();
       });
     }
@@ -2661,7 +2807,7 @@
   }
 
   function boot() {
-    ensureCePanelOutsideTestbenPanel();
+    ensureModulePanelsOutsideTestbenPanel();
     wireModuleTabSwitching();
 
     if (!ceCfg || ceCfg.enabled === false) {
@@ -2680,6 +2826,7 @@
       populateCeFilterSelectOptions();
       syncCeCustomFilterRowUI(1);
       syncCeCustomFilterRowUI(2);
+      syncCeQuickChips();
       cachedRows = [];
       renderTable();
     } catch (err) {

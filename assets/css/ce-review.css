@@ -1,0 +1,121 @@
+/**
+ * Module Rà soát CE | Giao mẫu — bổ sung giao diện (Tailwind cho shell, CSS cho bảng).
+ * Bảng 20 cột / nth-child giữ trong index.html; file này thêm đọc bảng + sticky.
+ */
+
+#panel-ce {
+  --ce-sticky-shadow: 4px 0 8px -2px rgba(15, 23, 42, 0.12);
+}
+
+/* Khi tab CE/P3 bật — tránh panel bị display:none do Tailwind .hidden scope sai (đã sửa :is) */
+#panel-ce:not([hidden]),
+#panel-p3:not([hidden]) {
+  display: block !important;
+}
+
+/* Zebra + hover (ưu tiên nhẹ hơn màu vùng cột) */
+#panel-ce .ce-table-wrap .ce-review-table tbody tr:nth-child(even) td {
+  filter: brightness(0.985);
+}
+
+#panel-ce .ce-table-wrap .ce-review-table tbody tr:hover td {
+  filter: brightness(0.96);
+}
+
+/* Sticky: Mã tác vụ + Task name */
+#panel-ce .ce-table-wrap .ce-review-table thead th:nth-child(1),
+#panel-ce .ce-table-wrap .ce-review-table tbody td:nth-child(1) {
+  position: sticky;
+  left: 0;
+  z-index: 4;
+  box-shadow: var(--ce-sticky-shadow);
+}
+
+#panel-ce .ce-table-wrap .ce-review-table tbody td:nth-child(1) {
+  z-index: 2;
+}
+
+#panel-ce .ce-table-wrap .ce-review-table thead th:nth-child(2),
+#panel-ce .ce-table-wrap .ce-review-table tbody td:nth-child(2) {
+  position: sticky;
+  z-index: 3;
+  box-shadow: var(--ce-sticky-shadow);
+}
+
+#panel-ce .ce-table-wrap .ce-review-table:not(.ce-hide-optional-cols) thead th:nth-child(2),
+#panel-ce .ce-table-wrap .ce-review-table:not(.ce-hide-optional-cols) tbody td:nth-child(2) {
+  left: 8%;
+}
+
+#panel-ce .ce-table-wrap .ce-review-table.ce-hide-optional-cols thead th:nth-child(2),
+#panel-ce .ce-table-wrap .ce-review-table.ce-hide-optional-cols tbody td:nth-child(2) {
+  left: 0;
+}
+
+#panel-ce .ce-table-wrap .ce-review-table thead th:nth-child(1),
+#panel-ce .ce-table-wrap .ce-review-table thead th:nth-child(2) {
+  z-index: 5;
+}
+
+#panel-ce .ce-table-wrap .ce-review-table tbody tr.ce-row-selected td:nth-child(1),
+#panel-ce .ce-table-wrap .ce-review-table tbody tr.ce-row-selected td:nth-child(2) {
+  background: #fff7cc !important;
+}
+
+#panel-ce .ce-table-wrap {
+  box-shadow: 0 4px 16px rgba(15, 23, 42, 0.06);
+}
+
+/* Ô lọc: đồng bộ với Tailwind trong panel (giữ class cũ cho JS) */
+#panel-ce .filter-select,
+#panel-ce .filter-input {
+  border-radius: 0.5rem;
+}
+
+#panel-ce .ce-filter-value-area {
+  min-width: 0;
+}
+
+/* Ghi đè rule global .ce-custom-filters trong index.html — ưu tiên shell Tailwind */
+#panel-ce .ce-custom-filters {
+  margin-top: 0;
+}
+
+#panel-ce .ce-custom-filter-rows {
+  gap: 0.75rem;
+}
+
+/* Chip lọc nhanh (không phụ thuộc utility động của Tailwind CDN) */
+#panel-ce .ce-chip.is-active {
+  background: #eff6ff !important;
+  border-color: #60a5fa !important;
+  color: #1e40af !important;
+}
+
+#panel-ce .ce-table-meta {
+  font-size: 0.875rem;
+  color: #475569;
+  margin-bottom: 0.5rem;
+  font-weight: 500;
+}
+
+/* Nền cột sticky — tránh trong suốt khi cuộn */
+#panel-ce .ce-table-wrap .ce-review-table thead th:nth-child(1) {
+  background: #f1f5f9;
+}
+
+#panel-ce .ce-table-wrap .ce-review-table thead th:nth-child(2) {
+  background: #f1f5f9;
+}
+
+#panel-ce .ce-table-wrap .ce-review-table tbody td:nth-child(1) {
+  background: #f8fafc;
+}
+
+#panel-ce .ce-table-wrap .ce-review-table:not(.ce-hide-optional-cols) tbody td:nth-child(2) {
+  background: #f8fafc;
+}
+
+#panel-ce .ce-table-wrap .ce-review-table.ce-hide-optional-cols tbody td:nth-child(2) {
+  background: #f8fafc;
+}

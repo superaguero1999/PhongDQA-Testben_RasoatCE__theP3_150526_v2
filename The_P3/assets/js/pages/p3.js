@@ -871,25 +871,25 @@ function buildDetailRow(displayItem, f1, v1, f2, v2, allItems) {
 function buildFiltersSectionHtml(fs) {
   const f = fs || { f1: "", v1: "", f2: "", v2: "" };
   return (
-    '<div class="p3-filters" role="search" aria-label="Lọc bảng P3" data-p3-filter-v="3">' +
-    '<div class="p3-filter-tier">' +
-    '<span class="p3-filter-tier-label">Lọc 1</span>' +
-    '<select id="p3-filter-1-field" class="p3-filter-select" aria-label="Trường lọc 1">' +
+    '<div class="p3-filters rounded-xl border border-slate-200 bg-slate-50/90 p-4 shadow-sm flex flex-col gap-3" role="search" aria-label="Lọc bảng P3" data-p3-filter-v="3">' +
+    '<div class="p3-filter-tier flex flex-wrap items-center gap-2 sm:gap-3">' +
+    '<span class="p3-filter-tier-label text-xs font-bold text-slate-600 min-w-[3.25rem]">Lọc 1</span>' +
+    '<select id="p3-filter-1-field" class="p3-filter-select text-sm border border-slate-300 rounded-lg min-w-[11rem]" aria-label="Trường lọc 1">' +
     p3FilterSelectOptionsHtml(f.f1) +
     "</select>" +
-    '<input id="p3-filter-1-val" class="p3-filter-input" type="text" placeholder="Giá trị chứa… (có thể chỉ lọc theo cột lượt)" autocomplete="off" aria-label="Giá trị lọc 1" />' +
+    '<input id="p3-filter-1-val" class="p3-filter-input flex-1 min-w-[8rem] max-w-xl text-sm border border-slate-300 rounded-lg" type="search" placeholder="Giá trị chứa… (có thể chỉ lọc theo cột lượt)" autocomplete="off" aria-label="Giá trị lọc 1" />' +
     "</div>" +
-    '<div class="p3-filter-tier">' +
-    '<span class="p3-filter-tier-label">Lọc 2</span>' +
-    '<select id="p3-filter-2-field" class="p3-filter-select" aria-label="Trường lọc 2">' +
+    '<div class="p3-filter-tier flex flex-wrap items-center gap-2 sm:gap-3">' +
+    '<span class="p3-filter-tier-label text-xs font-bold text-slate-600 min-w-[3.25rem]">Lọc 2</span>' +
+    '<select id="p3-filter-2-field" class="p3-filter-select text-sm border border-slate-300 rounded-lg min-w-[11rem]" aria-label="Trường lọc 2">' +
     p3FilterSelectOptionsHtml(f.f2) +
     "</select>" +
-    '<input id="p3-filter-2-val" class="p3-filter-input" type="text" placeholder="Giá trị chứa…" autocomplete="off" aria-label="Giá trị lọc 2" />' +
+    '<input id="p3-filter-2-val" class="p3-filter-input flex-1 min-w-[8rem] max-w-xl text-sm border border-slate-300 rounded-lg" type="search" placeholder="Giá trị chứa…" autocomplete="off" aria-label="Giá trị lọc 2" />' +
     "</div>" +
-    '<div class="p3-filter-actions">' +
-    '<button type="button" class="p3-btn p3-btn-end" id="p3-filter-clear">Xóa lọc</button>' +
-    '<button type="button" class="p3-btn" id="p3-export-excel">Xuất Excel</button>' +
-    '<button type="button" class="p3-help-link" id="p3-help-open" aria-haspopup="dialog">Hướng dẫn</button>' +
+    '<div class="p3-filter-actions flex flex-wrap items-center gap-2 mt-1 pt-3 border-t border-slate-200">' +
+    '<button type="button" class="p3-btn p3-btn-end text-sm px-3 py-1.5 rounded-lg border border-slate-300 bg-white hover:bg-slate-50" id="p3-filter-clear">Xóa lọc</button>' +
+    '<button type="button" class="p3-btn text-sm font-semibold px-3 py-1.5 rounded-lg border border-indigo-300 bg-indigo-50 text-indigo-900 hover:bg-indigo-100" id="p3-export-excel">Xuất Excel</button>' +
+    '<button type="button" class="p3-help-link text-sm text-indigo-700 underline underline-offset-2 hover:text-indigo-900" id="p3-help-open" aria-haspopup="dialog">Hướng dẫn</button>' +
     "</div>" +
     "</div>"
   );
@@ -918,14 +918,14 @@ function buildTableMountInner(displayItems, expandedSet, f1, v1, f2, v2, allItem
 
 function buildP3ChromeHtml(fs) {
   return (
-    '<div class="p3-wrap">' +
-    '<p class="p3-toolbar">' +
-    '<span id="p3-status" class="p3-status"></span>' +
-    '<button type="button" class="p3-btn" id="p3-stats-pic-open">Thống kê P3 theo PIC</button>' +
-    '<button type="button" class="p3-btn" id="p3-done-month-open">Dữ liệu Công chuẩn mới</button>' +
-    "</p>" +
+    '<div class="p3-wrap flex flex-col min-h-0">' +
+    '<div class="p3-toolbar flex flex-wrap items-center gap-2 mb-3">' +
+    '<span id="p3-status" class="p3-status text-sm text-slate-600 flex-1 min-w-[12rem]"></span>' +
+    '<button type="button" class="p3-btn text-sm font-semibold px-3 py-1.5 rounded-lg border border-violet-300 bg-violet-50 text-violet-900 hover:bg-violet-100" id="p3-stats-pic-open">Thống kê P3 theo PIC</button>' +
+    '<button type="button" class="p3-btn text-sm font-semibold px-3 py-1.5 rounded-lg border border-sky-300 bg-sky-50 text-sky-900 hover:bg-sky-100" id="p3-done-month-open">Dữ liệu Công chuẩn mới</button>' +
+    "</div>" +
     buildFiltersSectionHtml(fs) +
-    '<div id="p3-table-mount"></div>' +
+    '<div id="p3-table-mount" class="mt-1 min-w-0"></div>' +
     "</div>"
   );
 }
@@ -1264,16 +1264,26 @@ function closeP3DoneMonthDetailModal() {
   if (m) m.style.display = "none";
 }
 
+const P3_LOADING_BANNER_HTML =
+  '<div id="p3-loading-banner" class="p3-loading-banner rounded-xl border border-slate-200 bg-slate-50 p-4 shadow-sm" role="status" aria-live="polite">' +
+  '<p class="p3-loading-text text-sm font-semibold text-slate-800 m-0">Đang tải bảng theo dõi từ Worker…</p>' +
+  '<p class="p3-loading-hint text-xs text-slate-500 mt-2 mb-0 leading-relaxed">Vui lòng đợi vài giây. Nếu màn hình đứng lâu, kiểm tra mạng, Worker hoặc cấu hình CORS trên Cloudflare.</p>' +
+  "</div>";
+
 export function renderP3(outlet) {
+  const isEmbed = outlet && outlet.id === "p3-embed-root";
+  const panelCls = "panel p3-panel" + (isEmbed ? " p3-panel-embed" : "");
   outlet.innerHTML =
-    '<section class="panel p3-panel"><h1>Thẻ P3_Tối ưu Công chuẩn</h1><div id="p3-root"></div></section>';
+    '<section class="' +
+    panelCls +
+    '">' +
+    '<div class="flex flex-wrap items-center justify-between gap-3 border-b border-slate-200 pb-3 mb-4">' +
+    '<h1 class="p3-shell-title text-xl font-bold tracking-tight text-slate-900">Thẻ P3_Tối ưu Công chuẩn</h1>' +
+    "</div>" +
+    '<div id="p3-root"></div></section>';
 
   const root = outlet.querySelector("#p3-root");
-  root.innerHTML =
-    '<div id="p3-loading-banner" class="p3-loading-banner" role="status" aria-live="polite">' +
-    '<p class="p3-loading-text">Đang tải bảng theo dõi từ Worker…</p>' +
-    '<p class="p3-loading-hint">Vui lòng đợi vài giây. Nếu màn hình đứng lâu, kiểm tra mạng, Worker hoặc cấu hình CORS trên Cloudflare.</p>' +
-    "</div>";
+  root.innerHTML = P3_LOADING_BANNER_HTML;
 
   const expanded = new Set();
   let items = [];
@@ -1638,11 +1648,7 @@ export function renderP3(outlet) {
     if (!hadChrome) {
       const lb = root.querySelector("#p3-loading-banner");
       if (!lb) {
-        root.innerHTML =
-          '<div id="p3-loading-banner" class="p3-loading-banner" role="status" aria-live="polite">' +
-          '<p class="p3-loading-text">Đang tải bảng theo dõi từ Worker…</p>' +
-          '<p class="p3-loading-hint">Vui lòng đợi vài giây. Nếu màn hình đứng lâu, kiểm tra mạng, Worker hoặc cấu hình CORS trên Cloudflare.</p>' +
-          "</div>";
+        root.innerHTML = P3_LOADING_BANNER_HTML;
       }
     }
     try {
@@ -1666,7 +1672,7 @@ export function renderP3(outlet) {
         const dm2 = document.getElementById("p3-done-month-modal");
         if (dm2 && dm2.style.display === "block") refreshP3DoneMonthTable();
       } else {
-        root.innerHTML = `<p class="p3-err">${esc(msg)}</p>`;
+        root.innerHTML = `<p class="p3-err text-sm">${esc(msg)}</p>`;
         const st0 = statusEl();
         if (st0) st0.textContent = "";
       }

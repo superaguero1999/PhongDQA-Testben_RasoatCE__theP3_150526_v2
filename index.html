@@ -4,6 +4,24 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Form 15 - Kiểm soát test bền</title>
+  <link rel="stylesheet" href="./assets/css/testben.css" />
+  <link rel="stylesheet" href="./assets/css/ce-review.css" />
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      /* :is() bắt buộc — important dạng "a, b, c" khiến utility .hidden ẩn luôn #panel-ce / #panel-p3 */
+      important: ":is(#panel-ce, #panel-p3, .p3-panel)",
+      corePlugins: { preflight: false },
+      theme: {
+        extend: {
+          colors: {
+            "ce-zone": { DEFAULT: "#eff6ff", head: "#dbeafe" },
+            "gm-zone": { DEFAULT: "#faf5ff", head: "#f3e8ff" },
+          },
+        },
+      },
+    };
+  </script>
   <style>
     :root {
       color-scheme: light;
@@ -2114,6 +2132,42 @@
     <div id="status-box" class="status warn">Tải lại trang để cập nhật dữ liệu mới nhất</div>
     <div id="meta-box" class="meta"></div>
 
+    <div id="testben-kpi" class="testben-kpi" aria-label="Tóm tắt Test bền" hidden>
+      <div class="testben-kpi-card is-highlight" data-kpi="visible">
+        <span class="testben-kpi-value" id="testben-kpi-visible">0</span>
+        <span class="testben-kpi-label">Đang hiển thị</span>
+      </div>
+      <div class="testben-kpi-card status-pending" data-kpi="pending">
+        <span class="testben-kpi-value" id="testben-kpi-pending">0</span>
+        <span class="testben-kpi-pct" id="testben-kpi-pending-pct">0%</span>
+        <span class="testben-kpi-label">Pending</span>
+      </div>
+      <div class="testben-kpi-card status-doing" data-kpi="doing">
+        <span class="testben-kpi-value" id="testben-kpi-doing">0</span>
+        <span class="testben-kpi-pct" id="testben-kpi-doing-pct">0%</span>
+        <span class="testben-kpi-label">Doing</span>
+      </div>
+      <div class="testben-kpi-card status-done" data-kpi="done">
+        <span class="testben-kpi-value" id="testben-kpi-done">0</span>
+        <span class="testben-kpi-pct" id="testben-kpi-done-pct">0%</span>
+        <span class="testben-kpi-label">Done</span>
+      </div>
+      <div class="testben-kpi-card status-cancel" data-kpi="cancel">
+        <span class="testben-kpi-value" id="testben-kpi-cancel">0</span>
+        <span class="testben-kpi-pct" id="testben-kpi-cancel-pct">0%</span>
+        <span class="testben-kpi-label">Cancel</span>
+      </div>
+    </div>
+
+    <div class="testben-quick-filters" role="group" aria-label="Lọc nhanh Test bền">
+      <span class="testben-quick-label">Lọc nhanh:</span>
+      <button type="button" class="testben-chip" data-testben-quick="pending">Pending</button>
+      <button type="button" class="testben-chip" data-testben-quick="doing">Doing</button>
+      <button type="button" class="testben-chip" data-testben-quick="done">Done</button>
+      <button type="button" class="testben-chip" data-testben-quick="month">Tháng này</button>
+      <button type="button" class="testben-chip chip-clear" data-testben-quick="clear">Xóa lọc</button>
+    </div>
+
     <div class="filter-bar">
       <label class="filter-label" for="filter-field">Lọc theo:</label>
       <select id="filter-field" class="filter-select">
@@ -2151,66 +2205,104 @@
     </div>
 
     <section class="app-module-panel" data-module-panel="ce" id="panel-ce" hidden aria-label="Rà soát CE">
-      <div class="topbar">
-        <div class="topbar-lead">
-          <h1>Rà soát CE (checksheet)</h1>
+      <div class="flex flex-wrap items-center justify-between gap-3 border-b border-slate-200 pb-3 mb-4">
+        <div class="min-w-0">
+          <h1 class="text-xl font-bold tracking-tight text-slate-900 m-0">Rà soát CE (checksheet)</h1>
         </div>
-        <div class="actions" style="flex-wrap: wrap;">
-          <button id="ce-refresh-force-btn" type="button" class="btn btn-force-scan" title="Quét nguồn và đẩy toàn bộ dòng sang bảng CE">
+        <div class="flex flex-wrap gap-2 justify-end">
+          <button id="ce-refresh-force-btn" type="button" class="btn btn-force-scan text-sm" title="Quét nguồn và đẩy toàn bộ dòng sang bảng CE">
             Quét lại từ đầu
           </button>
-          <button id="ce-refresh-btn" type="button" class="btn btn-primary">Refresh dữ liệu</button>
-          <button id="ce-stats-btn" type="button" class="btn">Thống kê CE</button>
-          <button id="ce-giao-mau-stats-btn" type="button" class="btn">Thống kê giao mẫu</button>
+          <button id="ce-refresh-btn" type="button" class="btn btn-primary text-sm font-semibold shadow-sm">Refresh dữ liệu</button>
+          <button id="ce-stats-btn" type="button" class="btn text-sm font-bold">Thống kê CE</button>
+          <button id="ce-giao-mau-stats-btn" type="button" class="btn text-sm font-bold">Thống kê giao mẫu</button>
         </div>
       </div>
-      <div id="ce-custom-filters" class="ce-custom-filters" aria-label="Lọc theo trường tùy biến">
-        <div class="ce-custom-filter-rows">
-          <div class="ce-custom-filter-row">
-            <span class="ce-custom-filter-tag">Lọc 1</span>
-            <select id="ce-filter-field-1" class="filter-select ce-filter-field-select" aria-label="Trường lọc thứ nhất"></select>
-            <div class="ce-filter-value-area">
-              <input id="ce-filter-value-1" class="filter-input ce-filter-value-input" type="search" placeholder="Giá trị cần chứa…" autocomplete="off" aria-label="Giá trị lọc thứ nhất (văn bản)" />
+
+      <div id="ce-kpi" class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-2.5 mb-3" hidden aria-label="Tóm tắt CE">
+        <div class="rounded-lg border border-blue-200 bg-gradient-to-b from-blue-50 to-white p-3 shadow-sm">
+          <div id="ce-kpi-visible" class="text-2xl font-extrabold tabular-nums text-slate-900">0</div>
+          <div class="text-[11px] font-bold uppercase tracking-wide text-slate-500 mt-0.5">Đang hiển thị</div>
+        </div>
+        <div class="rounded-lg border border-slate-200 bg-white p-3 shadow-sm">
+          <div id="ce-kpi-chua-gui" class="text-2xl font-extrabold tabular-nums text-slate-600">0</div>
+          <div id="ce-kpi-chua-gui-pct" class="text-sm font-bold tabular-nums text-slate-500 mt-0.5">0%</div>
+          <div class="text-[11px] font-bold uppercase tracking-wide text-slate-500 mt-0.5">CE chưa gửi</div>
+        </div>
+        <div class="rounded-lg border border-emerald-200 bg-emerald-50/50 p-3 shadow-sm">
+          <div id="ce-kpi-da-gui" class="text-2xl font-extrabold tabular-nums text-emerald-700">0</div>
+          <div id="ce-kpi-da-gui-pct" class="text-sm font-bold tabular-nums text-emerald-600/90 mt-0.5">0%</div>
+          <div class="text-[11px] font-bold uppercase tracking-wide text-slate-500 mt-0.5">CE đã gửi</div>
+        </div>
+        <div class="rounded-lg border border-amber-200 bg-amber-50/50 p-3 shadow-sm">
+          <div id="ce-kpi-khong-can" class="text-2xl font-extrabold tabular-nums text-amber-800">0</div>
+          <div id="ce-kpi-khong-can-pct" class="text-sm font-bold tabular-nums text-amber-700/90 mt-0.5">0%</div>
+          <div class="text-[11px] font-bold uppercase tracking-wide text-slate-500 mt-0.5">CE không cần</div>
+        </div>
+        <div class="rounded-lg border border-violet-200 bg-violet-50/50 p-3 shadow-sm">
+          <div id="ce-kpi-gm-chua-gui" class="text-2xl font-extrabold tabular-nums text-violet-700">0</div>
+          <div id="ce-kpi-gm-chua-gui-pct" class="text-sm font-bold tabular-nums text-violet-600/90 mt-0.5">0%</div>
+          <div class="text-[11px] font-bold uppercase tracking-wide text-slate-500 mt-0.5">GM chưa gửi</div>
+        </div>
+      </div>
+
+      <div class="flex flex-wrap items-center gap-2 mb-3 p-3 bg-slate-50 border border-slate-200 rounded-xl" role="group" aria-label="Lọc nhanh CE">
+        <span class="text-xs font-bold text-slate-600 mr-1">Lọc nhanh:</span>
+        <button type="button" class="ce-chip px-3 py-1.5 text-xs font-semibold rounded-full border border-slate-300 bg-white text-slate-700 hover:bg-slate-100 transition-colors" data-ce-quick="ce-chua-gui">CE chưa gửi</button>
+        <button type="button" class="ce-chip px-3 py-1.5 text-xs font-semibold rounded-full border border-slate-300 bg-white text-slate-700 hover:bg-slate-100 transition-colors" data-ce-quick="ce-da-gui">CE đã gửi</button>
+        <button type="button" class="ce-chip px-3 py-1.5 text-xs font-semibold rounded-full border border-slate-300 bg-white text-slate-700 hover:bg-slate-100 transition-colors" data-ce-quick="ce-khong-can">CE không cần</button>
+        <button type="button" class="ce-chip px-3 py-1.5 text-xs font-semibold rounded-full border border-slate-300 bg-white text-slate-700 hover:bg-slate-100 transition-colors" data-ce-quick="gm-chua-gui">GM chưa gửi</button>
+        <button type="button" class="ce-chip px-3 py-1.5 text-xs font-semibold rounded-full border border-slate-300 bg-white text-slate-700 hover:bg-slate-100 transition-colors" data-ce-quick="month">Tháng này</button>
+        <button type="button" class="ce-chip px-3 py-1.5 text-xs font-semibold rounded-full border border-dashed border-slate-400 bg-white text-slate-500 hover:bg-slate-100 transition-colors" data-ce-quick="clear">Xóa lọc</button>
+      </div>
+
+      <div id="ce-custom-filters" class="ce-custom-filters rounded-xl border border-slate-200 bg-slate-50/90 p-4 shadow-sm" aria-label="Lọc theo trường tùy biến">
+        <div class="ce-custom-filter-rows flex flex-col gap-3">
+          <div class="ce-custom-filter-row flex flex-wrap items-center gap-2 sm:gap-3">
+            <span class="ce-custom-filter-tag text-xs font-bold text-slate-600 min-w-[3.25rem]">Lọc 1</span>
+            <select id="ce-filter-field-1" class="filter-select ce-filter-field-select text-sm border-slate-300 rounded-lg" aria-label="Trường lọc thứ nhất"></select>
+            <div class="ce-filter-value-area flex-1 min-w-[10rem] max-w-xl">
+              <input id="ce-filter-value-1" class="filter-input ce-filter-value-input w-full text-sm border-slate-300 rounded-lg" type="search" placeholder="Giá trị cần chứa…" autocomplete="off" aria-label="Giá trị lọc thứ nhất (văn bản)" />
               <div id="ce-filter-range-1" class="ce-filter-range" hidden>
-                <span class="filter-sublabel">Từ</span>
-                <input id="ce-filter-datetime-from-1" class="filter-input ce-filter-date-input" type="date" aria-label="Ngày từ (lọc 1)" />
-                <span class="filter-sublabel">Đến</span>
-                <input id="ce-filter-datetime-to-1" class="filter-input ce-filter-date-input" type="date" aria-label="Ngày đến (lọc 1)" />
+                <span class="filter-sublabel text-xs font-semibold text-slate-500">Từ</span>
+                <input id="ce-filter-datetime-from-1" class="filter-input ce-filter-date-input text-sm border-slate-300 rounded-lg" type="date" aria-label="Ngày từ (lọc 1)" />
+                <span class="filter-sublabel text-xs font-semibold text-slate-500">Đến</span>
+                <input id="ce-filter-datetime-to-1" class="filter-input ce-filter-date-input text-sm border-slate-300 rounded-lg" type="date" aria-label="Ngày đến (lọc 1)" />
               </div>
             </div>
           </div>
-          <div class="ce-custom-filter-row">
-            <span class="ce-custom-filter-tag">Lọc 2</span>
-            <select id="ce-filter-field-2" class="filter-select ce-filter-field-select" aria-label="Trường lọc thứ hai"></select>
-            <div class="ce-filter-value-area">
-              <input id="ce-filter-value-2" class="filter-input ce-filter-value-input" type="search" placeholder="Giá trị cần chứa…" autocomplete="off" aria-label="Giá trị lọc thứ hai (văn bản)" />
+          <div class="ce-custom-filter-row flex flex-wrap items-center gap-2 sm:gap-3">
+            <span class="ce-custom-filter-tag text-xs font-bold text-slate-600 min-w-[3.25rem]">Lọc 2</span>
+            <select id="ce-filter-field-2" class="filter-select ce-filter-field-select text-sm border-slate-300 rounded-lg" aria-label="Trường lọc thứ hai"></select>
+            <div class="ce-filter-value-area flex-1 min-w-[10rem] max-w-xl">
+              <input id="ce-filter-value-2" class="filter-input ce-filter-value-input w-full text-sm border-slate-300 rounded-lg" type="search" placeholder="Giá trị cần chứa…" autocomplete="off" aria-label="Giá trị lọc thứ hai (văn bản)" />
               <div id="ce-filter-range-2" class="ce-filter-range" hidden>
-                <span class="filter-sublabel">Từ</span>
-                <input id="ce-filter-datetime-from-2" class="filter-input ce-filter-date-input" type="date" aria-label="Ngày từ (lọc 2)" />
-                <span class="filter-sublabel">Đến</span>
-                <input id="ce-filter-datetime-to-2" class="filter-input ce-filter-date-input" type="date" aria-label="Ngày đến (lọc 2)" />
+                <span class="filter-sublabel text-xs font-semibold text-slate-500">Từ</span>
+                <input id="ce-filter-datetime-from-2" class="filter-input ce-filter-date-input text-sm border-slate-300 rounded-lg" type="date" aria-label="Ngày từ (lọc 2)" />
+                <span class="filter-sublabel text-xs font-semibold text-slate-500">Đến</span>
+                <input id="ce-filter-datetime-to-2" class="filter-input ce-filter-date-input text-sm border-slate-300 rounded-lg" type="date" aria-label="Ngày đến (lọc 2)" />
               </div>
             </div>
           </div>
         </div>
-        <div class="ce-custom-filters-actions">
-          <label for="ce-filter-month" style="font-weight:600;">Tháng</label>
-          <select id="ce-filter-month" class="filter-select ce-filter-field-select" style="min-width:170px;">
+        <div class="ce-custom-filters-actions flex flex-wrap items-center gap-2 mt-3 pt-3 border-t border-slate-200">
+          <label for="ce-filter-month" class="text-sm font-semibold text-slate-700">Tháng</label>
+          <select id="ce-filter-month" class="filter-select ce-filter-field-select text-sm border-slate-300 rounded-lg min-w-[170px]">
             <option value="">Tất cả tháng</option>
           </select>
-          <button id="ce-filter-custom-reset" type="button" class="btn btn-sm">Xóa lọc</button>
-          <button id="ce-export-excel-btn" type="button" class="btn btn-sm">Xuất excel</button>
+          <button id="ce-filter-custom-reset" type="button" class="btn btn-sm text-sm">Xóa lọc</button>
+          <button id="ce-export-excel-btn" type="button" class="btn btn-sm text-sm">Xuất excel</button>
         </div>
       </div>
-      <div id="ce-status" class="status" style="display:none;margin-top:10px;"></div>
-      <div style="margin-top:6px;">
-        <button id="ce-detail-btn" type="button" class="btn ce-detail-mini">Chi tiết</button>
+      <div id="ce-status" class="status mt-3 rounded-lg text-sm" style="display:none;"></div>
+      <div class="mt-2">
+        <button id="ce-detail-btn" type="button" class="btn ce-detail-mini text-xs px-3 py-1.5 rounded-lg border border-slate-300 bg-white hover:bg-slate-50">Chi tiết</button>
       </div>
-      <div id="ce-review-root" class="ce-review-root" style="margin-top:14px;"></div>
+      <div id="ce-review-root" class="ce-review-root mt-4"></div>
     </section>
 
     <section class="app-module-panel" data-module-panel="p3" id="panel-p3" hidden aria-label="Theo dõi P3">
-      <div id="p3-embed-root"></div>
+      <div id="p3-embed-root" class="min-w-0"></div>
     </section>
   </main>
 
@@ -2262,6 +2354,7 @@
           }
           injectCss("assets/css/base.css");
           injectCss("assets/css/p3.css");
+          injectCss("assets/css/p3-shell.css");
         } catch (e) {
           console.warn("Form15 P3 CSS:", e);
         }

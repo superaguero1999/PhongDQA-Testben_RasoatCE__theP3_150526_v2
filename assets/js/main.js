@@ -682,6 +682,158 @@
         String(nT) +
         " dòng";
     }
+    updateTestbenKpi(filteredLen);
+  }
+
+  /** UI Test bền: KPI + chip lọc nhanh (chỉ hiển thị / gán bộ lọc có sẵn). */
+  function updateTestbenKpi(filteredLen) {
+    const kpiRoot = document.getElementById("testben-kpi");
+    if (!kpiRoot) return;
+    const total = latestResults.length;
+    const show = total > 0;
+    kpiRoot.hidden = !show;
+    if (!show) return;
+
+    const visible = Number(filteredLen);
+    const nVisible = Number.isFinite(visible) ? visible : applyFilter().length;
+    const rows = applyFilter();
+    let pending = 0;
+    let doing = 0;
+    let done = 0;
+    let cancel = 0;
+    for (let i = 0; i < rows.length; i += 1) {
+      const st = normalizeDurStatus(rows[i] && rows[i].manual_status);
+      if (st === "Doing") doing += 1;
+      else if (st === "Done") done += 1;
+      else if (st === "Cancel") cancel += 1;
+      else pending += 1;
+    }
+    const set = (id, val) => {
+      const el = document.getElementById(id);
+      if (el) el.textContent = String(val);
+    };
+    const setWithPct = (countId, pctId, count) => {
+      set(countId, count);
+      set(pctId, durPercent(count, nVisible));
+    };
+    set("testben-kpi-visible", nVisible);
+    setWithPct("testben-kpi-pending", "testben-kpi-pending-pct", pending);
+    setWithPct("testben-kpi-doing", "testben-kpi-doing-pct", doing);
+    setWithPct("testben-kpi-done", "testben-kpi-done-pct", done);
+    setWithPct("testben-kpi-cancel", "testben-kpi-cancel-pct", cancel);
+    syncTestbenQuickChips();
+  }
+
+  function clearTestbenFilterState() {
+    currentFilter.field = "";
+    currentFilter.value = "";
+    currentFilter.dateFrom = "";
+    currentFilter.dateTo = "";
+    currentFilter2.field = "";
+    currentFilter2.value = "";
+    currentFilter2.dateFrom = "";
+    currentFilter2.dateTo = "";
+    if (ui.filterField) ui.filterField.value = "";
+    if (ui.filterValue) ui.filterValue.value = "";
+    if (ui.filterDateFrom) ui.filterDateFrom.value = "";
+    if (ui.filterDateTo) ui.filterDateTo.value = "";
+    if (ui.filterField2) ui.filterField2.value = "";
+    if (ui.filterValue2) ui.filterValue2.value = "";
+    if (ui.filterDateFrom2) ui.filterDateFrom2.value = "";
+    if (ui.filterDateTo2) ui.filterDateTo2.value = "";
+  }
+
+  function syncTestbenFilterUiFromState() {
+    if (ui.filterField) ui.filterField.value = currentFilter.field || "";
+    if (ui.filterValue) ui.filterValue.value = currentFilter.value || "";
+    if (ui.filterDateFrom) ui.filterDateFrom.value = currentFilter.dateFrom || "";
+    if (ui.filterDateTo) ui.filterDateTo.value = currentFilter.dateTo || "";
+    if (ui.filterField2) ui.filterField2.value = currentFilter2.field || "";
+    if (ui.filterValue2) ui.filterValue2.value = currentFilter2.value || "";
+    if (ui.filterDateFrom2) ui.filterDateFrom2.value = currentFilter2.dateFrom || "";
+    if (ui.filterDateTo2) ui.filterDateTo2.value = currentFilter2.dateTo || "";
+    updateFilterInputMode();
+  }
+
+  function syncTestbenQuickChips() {
+    const chips = document.querySelectorAll("#panel-testben [data-testben-quick]");
+    if (!chips.length) return;
+    const monthKey = getCurrentLocalMonthKey();
+    const monthFrom = monthKey ? monthKey + "-01" : "";
+    let monthTo = "";
+    if (monthKey) {
+      const parts = monthKey.split("-");
+      const y = parseInt(parts[0], 10);
+      const mo = parseInt(parts[1], 10);
+      if (Number.isFinite(y) && Number.isFinite(mo)) {
+        const last = new Date(y, mo, 0).getDate();
+        monthTo = monthKey + "-" + String(last).padStart(2, "0");
+      }
+    }
+    let active = "";
+    if (!hasActiveFilter()) {
+      active = "clear";
+    } else if (
+      currentFilter.field === "Trạng thái" &&
+      String(currentFilter.value || "").toLowerCase() === "pending" &&
+      !currentFilter2.field
+    ) {
+      active = "pending";
+    } else if (
+      currentFilter.field === "Trạng thái" &&
+      String(currentFilter.value || "").toLowerCase() === "doing" &&
+      !currentFilter2.field
+    ) {
+      active = "doing";
+    } else if (
+      currentFilter.field === "Trạng thái" &&
+      String(currentFilter.value || "").toLowerCase() === "done" &&
+      !currentFilter2.field
+    ) {
+      active = "done";
+    } else if (
+      currentFilter.field === "Ngày trả báo cáo tức thời" &&
+      currentFilter.dateFrom === monthFrom &&
+      currentFilter.dateTo === monthTo &&
+      !currentFilter2.field
+    ) {
+      active = "month";
+    }
+    chips.forEach((btn) => {
+      const kind = String(btn.getAttribute("data-testben-quick") || "");
+      btn.classList.toggle("is-active", kind === active);
+    });
+  }
+
+  function applyTestbenQuickFilter(kind) {
+    const k = String(kind || "");
+    clearTestbenFilterState();
+    if (k === "clear") {
+      syncTestbenFilterUiFromState();
+      syncTestbenQuickChips();
+      void renderFiltered().catch((err) => console.error("renderFiltered:", err));
+      return;
+    }
+    if (k === "pending" || k === "doing" || k === "done") {
+      currentFilter.field = "Trạng thái";
+      currentFilter.value = k.charAt(0).toUpperCase() + k.slice(1);
+    } else if (k === "month") {
+      const monthKey = getCurrentLocalMonthKey();
+      if (monthKey) {
+        currentFilter.field = "Ngày trả báo cáo tức thời";
+        currentFilter.dateFrom = monthKey + "-01";
+        const parts = monthKey.split("-");
+        const y = parseInt(parts[0], 10);
+        const mo = parseInt(parts[1], 10);
+        if (Number.isFinite(y) && Number.isFinite(mo)) {
+          const last = new Date(y, mo, 0).getDate();
+          currentFilter.dateTo = monthKey + "-" + String(last).padStart(2, "0");
+        }
+      }
+    }
+    syncTestbenFilterUiFromState();
+    syncTestbenQuickChips();
+    void renderFiltered().catch((err) => console.error("renderFiltered:", err));
   }
 
   const MANUAL_EDITABLE_FIELDS = [
@@ -3442,6 +3594,7 @@
       currentFilter.dateFrom = "";
       currentFilter.dateTo = "";
       updateFilterInputMode();
+      syncTestbenQuickChips();
       void renderFiltered().catch((err) => console.error("renderFiltered:", err));
     });
   }
@@ -3452,67 +3605,66 @@
       currentFilter2.dateFrom = "";
       currentFilter2.dateTo = "";
       updateFilterInputMode();
+      syncTestbenQuickChips();
       void renderFiltered().catch((err) => console.error("renderFiltered:", err));
     });
   }
   if (ui.filterValue) {
     ui.filterValue.addEventListener("input", () => {
       currentFilter.value = String(ui.filterValue.value || "");
+      syncTestbenQuickChips();
       void renderFiltered().catch((err) => console.error("renderFiltered:", err));
     });
   }
   if (ui.filterValue2) {
     ui.filterValue2.addEventListener("input", () => {
       currentFilter2.value = String(ui.filterValue2.value || "");
+      syncTestbenQuickChips();
       void renderFiltered().catch((err) => console.error("renderFiltered:", err));
     });
   }
   if (ui.filterDateFrom) {
     ui.filterDateFrom.addEventListener("change", () => {
       currentFilter.dateFrom = String(ui.filterDateFrom.value || "");
+      syncTestbenQuickChips();
       void renderFiltered().catch((err) => console.error("renderFiltered:", err));
     });
   }
   if (ui.filterDateFrom2) {
     ui.filterDateFrom2.addEventListener("change", () => {
       currentFilter2.dateFrom = String(ui.filterDateFrom2.value || "");
+      syncTestbenQuickChips();
       void renderFiltered().catch((err) => console.error("renderFiltered:", err));
     });
   }
   if (ui.filterDateTo) {
     ui.filterDateTo.addEventListener("change", () => {
       currentFilter.dateTo = String(ui.filterDateTo.value || "");
+      syncTestbenQuickChips();
       void renderFiltered().catch((err) => console.error("renderFiltered:", err));
     });
   }
   if (ui.filterDateTo2) {
     ui.filterDateTo2.addEventListener("change", () => {
       currentFilter2.dateTo = String(ui.filterDateTo2.value || "");
+      syncTestbenQuickChips();
       void renderFiltered().catch((err) => console.error("renderFiltered:", err));
     });
   }
   if (ui.filterClear) {
     ui.filterClear.addEventListener("click", () => {
-      currentFilter.field = "";
-      currentFilter.value = "";
-      currentFilter.dateFrom = "";
-      currentFilter.dateTo = "";
-      currentFilter2.field = "";
-      currentFilter2.value = "";
-      currentFilter2.dateFrom = "";
-      currentFilter2.dateTo = "";
-      if (ui.filterField) ui.filterField.value = "";
-      if (ui.filterValue) ui.filterValue.value = "";
-      if (ui.filterDateFrom) ui.filterDateFrom.value = "";
-      if (ui.filterDateTo) ui.filterDateTo.value = "";
-      if (ui.filterField2) ui.filterField2.value = "";
-      if (ui.filterValue2) ui.filterValue2.value = "";
-      if (ui.filterDateFrom2) ui.filterDateFrom2.value = "";
-      if (ui.filterDateTo2) ui.filterDateTo2.value = "";
+      clearTestbenFilterState();
       updateFilterInputMode();
+      syncTestbenQuickChips();
       void renderFiltered().catch((err) => console.error("renderFiltered:", err));
     });
   }
+
+  document.querySelectorAll("#panel-testben [data-testben-quick]").forEach((btn) => {
+    btn.addEventListener("click", () => {
+      applyTestbenQuickFilter(btn.getAttribute("data-testben-quick"));
+    });
+  });
 
   ui.tableRoot.addEventListener("click", (event) => {
     const tr = event.target && event.target.closest ? event.target.closest("tbody tr") : null;
