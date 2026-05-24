@@ -2323,7 +2323,7 @@
     const nowKey = getCurrentLocalMonthKey();
     if (nowKey) monthsSet[nowKey] = true;
     const months = Object.keys(monthsSet).sort().reverse();
-    let selectedMonth = months.length ? (months.indexOf(nowKey) >= 0 ? nowKey : months[0]) : "__all__";
+    let selectedMonth = "__all__";
     if (modal.monthSelect) {
       const allOpt = '<option value="__all__">Tất cả tháng</option>';
       const monthOpts = months.map((m) => '<option value="' + m + '">' + formatMonthLabel(m) + "</option>").join("");
